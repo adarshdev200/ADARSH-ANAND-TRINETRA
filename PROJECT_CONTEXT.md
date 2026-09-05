@@ -43,28 +43,25 @@ Everything lives under `~/Desktop/Trinetra/` on the dev machine. **Important: th
 
 ```
 Trinetra/
-├── mandir-crowd-monitor/     # Python CV engine + a Node backend dev copy
-│   ├── main.py               # entry: runs 3 zone pipelines + MJPEG feed server
-│   ├── demo_video.py         # single-file demo of the pipeline
-│   ├── requirements.txt
-│   ├── venv/                 # Python virtualenv
-│   ├── yolov8n.pt            # YOLO nano weights (auto-downloaded)
-│   ├── videos/               # vtest.avi, Entrance.mp4, Exit.mp4 (test clips)
-│   ├── src/                  # CV modules (see §4)
-│   ├── tests/                # pytest suite (23 tests)
-│   └── backend/              # Node backend — DEV COPY, synced into shared-repo before push
+├── mandir-crowd-monitor/     # umbrella for the CV engine + Node backend
+│   ├── cv-engine/            # Python CV engine (the "sensor")
+│   │   ├── main.py           # entry: runs 3 zone pipelines + MJPEG feed server
+│   │   ├── demo_video.py     # single-file demo of the pipeline
+│   │   ├── requirements.txt
+│   │   ├── venv/             # Python virtualenv
+│   │   ├── yolov8n.pt        # YOLO nano weights (auto-downloaded)
+│   │   ├── videos/           # vtest.avi, Entrance.mp4, Exit.mp4 (test clips)
+│   │   ├── src/              # CV modules (see §4)
+│   │   └── tests/            # pytest suite (23 tests)
+│   └── backend/              # Node backend (the "brain")
 │
-├── trinetra-frontend/        # React dashboard — ACTIVE, EDITED, **NOT pushed** (own git)
+├── trinetra-frontend/        # React dashboard (Vite + Tailwind)
 │   ├── src/                  # pages, components, contexts, hooks, services
 │   ├── public/               # hero-temple.png, trinetra-logo.png/.jpeg, trinetra-icon.png
 │   ├── vite.config.js, tailwind.config.js, package.json
 │
-├── shared-repo/              # clone of the GitHub monorepo (git pushes happen here)
-│   ├── src/                  # the frontend AS ON GITHUB (older, teammate's — NOT my edits)
-│   ├── backend/              # the backend AS ON GITHUB (pushed, up to date)
-│   └── band/                 # ESP32 firmware (teammate pushed here)
-│
-├── Entrance.mp4, Exit.mp4    # original test videos (copies also in videos/)
+├── band/                     # ESP32 SOS band firmware
+├── barricade/                # Raspberry Pi Pico gate-LED system (agent.py + pico/main.py)
 └── PROJECT_CONTEXT.md        # this file
 ```
 
@@ -93,7 +90,7 @@ Trinetra/
 
 ---
 
-## 4. Python CV engine (`mandir-crowd-monitor/`)
+## 4. Python CV engine (`mandir-crowd-monitor/cv-engine/`)
 
 ### Concept
 Three **zones**, each a camera in its own thread:
@@ -238,7 +235,7 @@ brew services start mongodb-community
 cd ~/Desktop/Trinetra/mandir-crowd-monitor/backend && npm install && npm start
 
 # 3. Python CV engine + MJPEG feeds (:8090)
-cd ~/Desktop/Trinetra/mandir-crowd-monitor
+cd ~/Desktop/Trinetra/mandir-crowd-monitor/cv-engine
 source venv/bin/activate
 pip install -r requirements.txt      # first time
 python main.py

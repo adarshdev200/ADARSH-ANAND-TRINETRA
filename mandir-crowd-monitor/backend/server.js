@@ -85,6 +85,23 @@ app.post("/api/reset", async (_req, res) => {
   res.json(status);
 });
 
+// TEST ONLY: force the gate OPEN/CLOSED to check the barricade LEDs without the
+// CV pipeline. Sets the stored gate directly; a later enter/exit event still
+// re-runs hysteresis, so this is for standalone LED/demo testing.
+app.post("/api/gate", async (req, res) => {
+  const { gate } = req.body ?? {};
+  if (gate !== "OPEN" && gate !== "CLOSED") {
+    return res.status(400).json({ error: "gate must be 'OPEN' or 'CLOSED'" });
+  }
+  const state = await getState();
+  state.gate = gate;
+  await state.save();
+  const status = toStatus(state);
+  broadcast(status);
+  await broadcastZones();
+  res.json(status);
+});
+
 // per-zone live count (e.g. the outside corridor): { count }
 app.post("/api/zones/:zone", async (req, res) => {
   const { zone } = req.params;
